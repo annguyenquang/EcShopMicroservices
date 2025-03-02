@@ -4,7 +4,7 @@ namespace Catalog.API.Products.GetProductById;
 
 public record GetProductByIdResponse(Product Product);
 
-public record GetProductByIdRequest(Guid ProductId);
+//public record GetProductByIdRequest(Guid ProductId);
 
 public class GetProductByIdEndpoint : ICarterModule
 {
@@ -15,6 +15,11 @@ public class GetProductByIdEndpoint : ICarterModule
             var query = new GetProductByIdQuery(Id);
             var result = await sender.Send(query);
             return result.Adapt<GetProductByIdResponse>();
-        });
+        })
+            .WithName("GetProductById")
+            .Produces<GetProductByIdResponse>(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .WithSummary("Get Product By Id")
+            .WithDescription("Get Product By Id");
     }
 }

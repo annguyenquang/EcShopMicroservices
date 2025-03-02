@@ -1,6 +1,7 @@
 using Catalog.API.Products.CreateProduct;
 using Catalog.API.Products.GetProductById;
 using Catalog.API.Products.GetProducts;
+using Catalog.API.Products.GetProductsByCategory;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCarter(configurator: (config) =>
 {
     config.WithModules([
+        typeof(GetProductsByCategoryEndpoint), 
         typeof(GetProductByIdEndpoint), 
         typeof(CreateProductEnpoint), 
         typeof(GetProductsEnpoint)]);
@@ -23,6 +25,8 @@ builder.Services.AddMarten(opts =>
 {
     opts.Connection(builder.Configuration.GetConnectionString("Database")! );
 }).UseLightweightSessions();
+
+builder.Services.AddLogging();
 
 var app = builder.Build();
 
