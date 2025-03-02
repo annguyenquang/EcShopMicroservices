@@ -1,17 +1,33 @@
+using Catalog.API.Products.CreateProduct;
+using Catalog.API.Products.GetProductById;
+using Catalog.API.Products.GetProducts;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to container
 
-builder.Services.AddCarter();
+builder.Services.AddCarter(configurator: (config) =>
+{
+    config.WithModules([
+        typeof(GetProductByIdEndpoint), 
+        typeof(CreateProductEnpoint), 
+        typeof(GetProductsEnpoint)]);
+});
+
 builder.Services.AddMediatR(config =>
 {
     config.RegisterServicesFromAssembly(typeof(Program).Assembly);
 });
 
+builder.Services.AddMarten(opts =>
+{
+    opts.Connection(builder.Configuration.GetConnectionString("Database")! );
+}).UseLightweightSessions();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline
 
-app.MapCarter(); 
+app.MapCarter();
 
 app.Run();
