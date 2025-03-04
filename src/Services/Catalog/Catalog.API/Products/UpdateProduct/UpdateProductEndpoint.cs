@@ -11,7 +11,7 @@ public record UpdateProductRequest(
      decimal Price
     );
 
-public record UpdateProductResult(bool IsSuccess);
+public record UpdateProductResponse(bool IsSuccess);
 public class UpdateProductEndpoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
@@ -20,7 +20,14 @@ public class UpdateProductEndpoint : ICarterModule
         {
             var command = request.Adapt<UpdateProductCommand>();
             var result = await sender.Send(command);
-            return Results.Ok(result);
-        });
+            var response = result.Adapt<UpdateProductResponse>();
+            return Results.Ok(response);
+        })
+            .WithName("UpdateProduct")
+            .Produces<UpdateProductResponse>(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .WithSummary("Update Product")
+            .WithDescription("Update Product");
     }
 }
