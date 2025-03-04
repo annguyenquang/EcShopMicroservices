@@ -2,6 +2,7 @@ using Catalog.API.Products.CreateProduct;
 using Catalog.API.Products.GetProductById;
 using Catalog.API.Products.GetProducts;
 using Catalog.API.Products.GetProductsByCategory;
+using Catalog.API.Products.UpdateProduct;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +13,7 @@ builder.Services.AddCarter(configurator: (config) =>
     config.WithModules([
         typeof(GetProductsByCategoryEndpoint), 
         typeof(GetProductByIdEndpoint), 
+        typeof(UpdateProductEndpoint), 
         typeof(CreateProductEnpoint), 
         typeof(GetProductsEnpoint)]);
 });
