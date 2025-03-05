@@ -3,6 +3,7 @@ using Catalog.API.Products.GetProductById;
 using Catalog.API.Products.GetProducts;
 using Catalog.API.Products.GetProductsByCategory;
 using Catalog.API.Products.UpdateProduct;
+using BuildingBlocks.Behaviours;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +22,7 @@ builder.Services.AddCarter(configurator: (config) =>
 builder.Services.AddMediatR(config =>
 {
     config.RegisterServicesFromAssembly(typeof(Program).Assembly);
+    config.AddOpenBehavior(typeof(ValidationBehaviour<,>));
 });
 
 builder.Services.AddMarten(opts =>
@@ -29,6 +31,7 @@ builder.Services.AddMarten(opts =>
 }).UseLightweightSessions();
 
 builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
+
 
 builder.Services.AddLogging();
 
