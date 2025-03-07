@@ -4,6 +4,7 @@ using Catalog.API.Products.GetProducts;
 using Catalog.API.Products.GetProductsByCategory;
 using Catalog.API.Products.UpdateProduct;
 using BuildingBlocks.Behaviours;
+using Catalog.API.Products.DeleteProduct;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +16,7 @@ builder.Services.AddCarter(configurator: (config) =>
         typeof(GetProductsByCategoryEndpoint), 
         typeof(GetProductByIdEndpoint), 
         typeof(UpdateProductEndpoint), 
+        typeof(DeleteProductEndpoint), 
         typeof(CreateProductEnpoint), 
         typeof(GetProductsEnpoint)]);
 });
