@@ -4,10 +4,8 @@ using Catalog.API.Products.GetProducts;
 using Catalog.API.Products.GetProductsByCategory;
 using Catalog.API.Products.UpdateProduct;
 using BuildingBlocks.Behaviours;
+using BuildingBlocks.Exceptions.Handler;
 using Catalog.API.Products.DeleteProduct;
-using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Builder;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,14 +18,15 @@ builder.Services.AddCarter(configurator: (config) =>
         typeof(GetProductByIdEndpoint),
         typeof(UpdateProductEndpoint),
         typeof(DeleteProductEndpoint),
-        typeof(CreateProductEnpoint),
+        typeof(CreateProductEndpoint),
         typeof(GetProductsEnpoint)]);
 });
 
 builder.Services.AddMediatR(config =>
 {
     config.RegisterServicesFromAssembly(typeof(Program).Assembly);
-    config.AddOpenBehavior(typeof(ValidationBehaviour<,>));
+    config.AddOpenBehavior(typeof(ValidationBehaviour<,>), ServiceLifetime.Scoped);
+    config.AddOpenBehavior(typeof(LoggingBehaviour<,>), ServiceLifetime.Scoped);
 });
 
 builder.Services.AddMarten(opts =>
@@ -37,6 +36,7 @@ builder.Services.AddMarten(opts =>
 
 builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
 
+builder.Services.AddExceptionHandler<CustomExceptionHandler>();
 
 builder.Services.AddLogging();
 
@@ -46,33 +46,6 @@ var app = builder.Build();
 
 app.MapCarter();
 
-app.UseExceptionHandler(applicationBuilder =>
-{
-    applicationBuilder.Run(async context =>
-    {
-        var exception = context.Features.Get<IExceptionHandlerFeature>()?.Error;
-
-        if (exception is null)
-        {
-            return;
-        }
-
-        var problemDetails = new ProblemDetails
-        {
-            Title = exception.Message,
-            Status = StatusCodes.Status500InternalServerError,
-            Detail = exception.StackTrace
-        };
-
-        var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
-        logger.LogError(exception, exception.Message);
-
-        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-        context.Response.ContentType = "application/problem+json";
-
-        await context.Response.WriteAsJsonAsync(problemDetails);
-    });
-});
+app.UseExceptionHandler("/Error");
 
 app.Run();
-
