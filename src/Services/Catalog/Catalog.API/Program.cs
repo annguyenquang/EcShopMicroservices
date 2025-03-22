@@ -3,8 +3,6 @@ using Catalog.API.Products.GetProductById;
 using Catalog.API.Products.GetProducts;
 using Catalog.API.Products.GetProductsByCategory;
 using Catalog.API.Products.UpdateProduct;
-using BuildingBlocks.Behaviours;
-using BuildingBlocks.Exceptions.Handler;
 using Catalog.API.Products.DeleteProduct;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -33,6 +31,11 @@ builder.Services.AddMarten(opts =>
 {
     opts.Connection(builder.Configuration.GetConnectionString("Database")!);
 }).UseLightweightSessions();
+
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.InitializeMartenWith<CatalogInitialData>();
+}
 
 builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
 
