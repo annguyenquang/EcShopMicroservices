@@ -1,6 +1,21 @@
-﻿namespace Basket.API.Basket.DeleteBasket
+﻿using Basket.API.Data;
+
+namespace Basket.API.Basket.DeleteBasket;
+public record DeleteBasketCommand(string UserName) : ICommand<DeleteBasketResult>;
+public record DeleteBasketResult(bool IsSuccess);
+
+public class DeleteBasketCommandValidator : AbstractValidator<DeleteBasketCommand>
 {
-    public class DeleteBasketHandler
+    public DeleteBasketCommandValidator()
     {
+        RuleFor(x => x.UserName).NotEmpty().WithMessage("UserName is required");
+    }
+}
+public class DeleteBasketCommandHandler(IBasketRepository basketRepository) : ICommandHandler<DeleteBasketCommand, DeleteBasketResult>
+{
+    public async Task<DeleteBasketResult> Handle(DeleteBasketCommand req, CancellationToken cancellationToken)
+    {
+        await basketRepository.DeleteBasket(req.UserName, cancellationToken); 
+        return new DeleteBasketResult(true);
     }
 }
